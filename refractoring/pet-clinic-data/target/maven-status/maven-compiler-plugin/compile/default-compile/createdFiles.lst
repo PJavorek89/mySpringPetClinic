@@ -1,0 +1,5 @@
+com\petClinic\javorek\petclinic\model\Vet.class
+com\petClinic\javorek\petclinic\model\Owner.class
+com\petClinic\javorek\petclinic\model\PetType.class
+com\petClinic\javorek\petclinic\model\Pet.class
+com\petClinic\javorek\petclinic\model\Person.class
