@@ -5,7 +5,22 @@
     <title>List of owner</title>
 </head>
 <body>
-<h1 th:text="'Index page-owners'">Index page-owners</h1>
+<h2 th:text="'Index page-owners'">Index page-owners</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>First name</th>
+        <th>Last name</th>
+    </tr>
+    </thead>
+    <tbody>
+    ¨<tr th:each="owner : ${owner}">
+        <td th:text="${owner.id}">1</td>
+    </tr>
+    </tbody>
+</table>
 
 
 </body>
