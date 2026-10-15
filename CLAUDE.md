@@ -10,23 +10,20 @@ The full specification is in `docs/SPEC.md`. Follow it; ask before deviating.
 
 ## Repository layout
 
-Personal learning project (Udemy "Spring Framework 5: Beginner to Guru" Pet Clinic), used to practice Claude Code. The repo root is **not** a build root and contains several overlapping copies of the project:
-
-- `petclinic/` — the active multi-module Maven project (work here).
-- `petclinic/togithub/`, `togithub/`, `project/`, `refractoring/`, `petclinic/petclinic/`, `petclinic.zip` — older snapshots / earlier single-module or partial versions. Don't edit them unless asked.
+Personal learning project (Udemy "Spring Framework 5: Beginner to Guru" Pet Clinic), used to practice Claude Code. The repo root is **not** a build root; the whole project is the multi-module Maven build in `petclinic/`. Older snapshots were removed in a cleanup and remain reachable via the git tag `pre-cleanup`.
 
 ## Commands
 
-Run from `petclinic/` (uses the Maven wrapper; Spring Boot 2.5.6 parent):
+Run from `petclinic/` (Spring Boot 2.5.6 parent). The Maven wrapper is not set up (`mvnw` exists but `.mvn/` is missing); use the locally installed `mvn`. To add the wrapper, run `mvn wrapper:wrapper` in `petclinic/`.
 
 ```
-./mvnw clean install                      # build all modules
-./mvnw test                               # all tests
-./mvnw test -pl pet-clinic-web -Dtest=PetclinicApplicationTests   # single test class
-./mvnw spring-boot:run -pl pet-clinic-web # run the app (main class lives in pet-clinic-web)
+mvn clean install                      # build all modules
+mvn test                               # all tests
+mvn test -pl pet-clinic-web -Dtest=PetclinicApplicationTests   # single test class
+mvn spring-boot:run -pl pet-clinic-web # run the app (main class lives in pet-clinic-web)
 ```
 
-Note: `pet-clinic-web` depends on `pet-clinic-data` at a hard-coded version `0.0.2`, matching the parent version, so keep them in sync when bumping versions (`release.properties` / `pom.xml.releaseBackup` come from maven-release-plugin).
+Note: `pet-clinic-web` depends on `pet-clinic-data` at a hard-coded version `0.0.2`, matching the parent version, so keep them in sync when bumping versions.
 
 ## Architecture
 
@@ -43,7 +40,7 @@ The parent `pom.xml` sets `java.version` 1.8, while the modules override the com
 
 ## Tech stack (target)
 
-- Java 21, Spring Boot 3.x, Maven (use the wrapper: `./mvnw`)
+- Java 21, Spring Boot 3.x, Maven (local `mvn`; wrapper not set up)
 - Spring Web, Spring Data JPA, H2 (dev), Bean Validation (`jakarta.*`, never `javax.*`)
 - springdoc-openapi for Swagger UI
 - Lombok is allowed for entities and DTOs
@@ -59,6 +56,6 @@ The parent `pom.xml` sets `java.version` 1.8, while the modules override the com
 
 ## Workflow rules
 
-- Work in small steps. After each step run `./mvnw verify` and make sure it passes.
+- Work in small steps. After each step run `mvn verify` and make sure it passes.
 - Do not commit; I review the diff and commit myself.
 - Explain non-obvious changes briefly – I am learning, so tell me *why*, not just *what*.
