@@ -1,7 +1,7 @@
 package com.petClinic.javorek.petclinic.model;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 /**
