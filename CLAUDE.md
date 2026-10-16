@@ -23,7 +23,7 @@ mvn test -pl pet-clinic-web -Dtest=PetclinicApplicationTests   # single test cla
 mvn spring-boot:run -pl pet-clinic-web # run the app (main class lives in pet-clinic-web)
 ```
 
-Note: `pet-clinic-web` depends on `pet-clinic-data` at a hard-coded version `0.0.2`, matching the parent version, so keep them in sync when bumping versions.
+Note: `pet-clinic-web` depends on `pet-clinic-data` at a hard-coded version `0.0.2` -> replaced with `${project.version}`, so it follows the parent version automatically. The `<parent>` blocks in both modules still need a literal version, so when bumping versions change it in `petclinic/pom.xml` and in the `<parent>` of `pet-clinic-data` and `pet-clinic-web`.
 
 ## Architecture
 

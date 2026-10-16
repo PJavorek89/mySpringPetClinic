@@ -1,23 +1,14 @@
 package com.petClinic.javorek.petclinic.model;
 
-public class Person extends BaseEntity{
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@MappedSuperclass
+public class Person extends BaseEntity {
 
     private String firstName;
-    private String secondName;
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
-    }
+    private String lastName;
 }
