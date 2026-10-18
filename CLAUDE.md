@@ -23,7 +23,7 @@ Run from `petclinic/` (Spring Boot 3.5, Java 21). Use the Maven wrapper (`mvnw`,
 ./mvnw clean install                   # rebuild all modules
 ./mvnw test                            # all tests
 ./mvnw test -pl pet-clinic-web -Dtest=PetclinicApplicationTests   # single test class
-mvnw spring-boot:run -pl pet-clinic-web # run the app (main class lives in pet-clinic-web)
+./mvnw spring-boot:run -pl pet-clinic-web # run the app (main class lives in pet-clinic-web)
 ```
 
 Note: `pet-clinic-web` depends on `pet-clinic-data` at a hard-coded version `0.0.2` -> replaced with `${project.version}`, so it follows the parent version automatically. The `<parent>` blocks in both modules still need a literal version, so when bumping versions change it in `petclinic/pom.xml` and in the `<parent>` of `pet-clinic-data` and `pet-clinic-web`.

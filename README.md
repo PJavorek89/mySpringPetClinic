@@ -11,7 +11,7 @@ The project lives in the `petclinic/` directory (Java 21, Spring Boot 3.5, Maven
 ```
 cd petclinic
 ./mvnw install                          # first (clean clone): build + tests + install modules
-mvnw spring-boot:run -pl pet-clinic-web # starts on http://localhost:8080
+./mvnw spring-boot:run -pl pet-clinic-web # starts on http://localhost:8080
 ```
 
 `install` must come first: `-pl pet-clinic-web` builds only one module, and that module needs `pet-clinic-data` in the local Maven repository. In PowerShell use `.\mvnw`.
