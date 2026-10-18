@@ -174,6 +174,21 @@ class OwnerRestControllerTest {
     }
 
     @Test
+    void addPetWithUnknownTypeReturns400() throws Exception {
+        when(petTypeService.getById(1L)).thenThrow(new NotFoundException("PetType", 1L));
+        mvc.perform(post("/api/owners/1/pets").contentType(MediaType.APPLICATION_JSON).content(PET_BODY))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.errors.typeId").exists());
+    }
+
+    @Test
+    void updatePetWithUnknownTypeReturns400() throws Exception {
+        when(petService.getById(2L)).thenReturn(pet(2, owner(1)));
+        when(petTypeService.getById(1L)).thenThrow(new NotFoundException("PetType", 1L));
+        mvc.perform(put("/api/owners/1/pets/2").contentType(MediaType.APPLICATION_JSON).content(PET_BODY))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.errors.typeId").exists());
+    }
+
+    @Test
     void addPetToUnknownOwnerReturns404() throws Exception {
         when(petTypeService.getById(1L)).thenReturn(type());
         when(petService.addToOwner(eq(9L), any())).thenThrow(new NotFoundException("Owner", 9L));

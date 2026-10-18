@@ -9,6 +9,7 @@ import com.petClinic.javorek.petclinic.dto.VisitRequest;
 import com.petClinic.javorek.petclinic.mapper.ClinicMapper;
 import com.petClinic.javorek.petclinic.model.Owner;
 import com.petClinic.javorek.petclinic.model.Pet;
+import com.petClinic.javorek.petclinic.model.PetType;
 import com.petClinic.javorek.petclinic.model.Visit;
 import com.petClinic.javorek.petclinic.services.NotFoundException;
 import com.petClinic.javorek.petclinic.services.OwnerService;
@@ -86,7 +87,7 @@ public class OwnerRestController {
     @PostMapping("/{ownerId}/pets")
     public ResponseEntity<PetDto> addPet(@PathVariable Long ownerId, @Valid @RequestBody PetRequest request) {
         Pet pet = new Pet();
-        mapper.update(pet, request, petTypeService.getById(request.typeId()));
+        mapper.update(pet, request, petTypeOf(request));
         Pet saved = petService.addToOwner(ownerId, pet);
         return ResponseEntity.created(Locations.ofNewChild(saved.getId())).body(mapper.toDto(saved));
     }
@@ -100,7 +101,7 @@ public class OwnerRestController {
     public ResponseEntity<Void> updatePet(@PathVariable Long ownerId, @PathVariable Long petId,
                                           @Valid @RequestBody PetRequest request) {
         Pet pet = ownersPet(ownerId, petId);
-        mapper.update(pet, request, petTypeService.getById(request.typeId()));
+        mapper.update(pet, request, petTypeOf(request));
         petService.save(pet);
         return ResponseEntity.noContent().build();
     }
@@ -111,6 +112,15 @@ public class OwnerRestController {
         ownersPet(ownerId, petId);
         Visit saved = visitService.addToPet(petId, mapper.toEntity(request));
         return ResponseEntity.created(Locations.of("/api/visits/{id}", saved.getId())).body(mapper.toDto(saved));
+    }
+
+    // typeId comes from the request body, so an unknown id is invalid input (400), not a missing resource (404).
+    private PetType petTypeOf(PetRequest request) {
+        try {
+            return petTypeService.getById(request.typeId());
+        } catch (NotFoundException e) {
+            throw new InvalidReferenceException("typeId", "Pet type with id " + request.typeId() + " does not exist");
+        }
     }
 
     // A pet is only reachable through its own owner; any other combination is a 404.

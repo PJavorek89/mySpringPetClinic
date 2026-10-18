@@ -14,13 +14,16 @@ Personal learning project (Udemy "Spring Framework 5: Beginner to Guru" Pet Clin
 
 ## Commands
 
-Run from `petclinic/` (Spring Boot 3.5, Java 21). The Maven wrapper exists (`mvnw`), the locally installed `mvn` works too.
+Run from `petclinic/` (Spring Boot 3.5, Java 21). Use the Maven wrapper (`mvnw`, no local Maven needed).
+
+**On a clean clone run `./mvnw install` first.** `-pl pet-clinic-web` builds only that module, so `pet-clinic-data` must already be in the local Maven repository, otherwise `spring-boot:run` fails to resolve it.
 
 ```
-mvn clean install                      # build all modules
-mvn test                               # all tests
-mvn test -pl pet-clinic-web -Dtest=PetclinicApplicationTests   # single test class
-mvn spring-boot:run -pl pet-clinic-web # run the app (main class lives in pet-clinic-web)
+./mvnw install                         # FIRST on a clean clone: build + install all modules
+./mvnw clean install                   # rebuild all modules
+./mvnw test                            # all tests
+./mvnw test -pl pet-clinic-web -Dtest=PetclinicApplicationTests   # single test class
+mvnw spring-boot:run -pl pet-clinic-web # run the app (main class lives in pet-clinic-web)
 ```
 
 Note: `pet-clinic-web` depends on `pet-clinic-data` at a hard-coded version `0.0.2` -> replaced with `${project.version}`, so it follows the parent version automatically. The `<parent>` blocks in both modules still need a literal version, so when bumping versions change it in `petclinic/pom.xml` and in the `<parent>` of `pet-clinic-data` and `pet-clinic-web`.
@@ -53,6 +56,6 @@ Multi-module Maven build (`groupId com.petClinic.javorek`, package root `com.pet
 
 ## Workflow rules
 
-- Work in small steps. After each step run `mvn verify` and make sure it passes.
+- Work in small steps. After each step run `./mvnw verify` and make sure it passes.
 - Do not commit; I review the diff and commit myself.
 - Explain non-obvious changes briefly – I am learning, so tell me *why*, not just *what*.
