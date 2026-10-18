@@ -3,5 +3,6 @@ target/
 *.iml
 *.releaseBackup
 release.properties
-./docs/sessions/
-./docs/session/
+docs/sessions/
+docs/session/
+CLAUDE.local.md
