@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 public class SpecialtyServiceImpl extends AbstractJpaService<Specialty, SpecialtyRepository> implements SpecialtyService {
 
     public SpecialtyServiceImpl(SpecialtyRepository repository) {
-        super(repository);
+        super(repository, "Specialty");
     }
 }

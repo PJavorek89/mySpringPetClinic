@@ -8,6 +8,9 @@ public interface CrudService<T, ID> {
 
     T findById(ID id);
 
+    // Like findById, but throws NotFoundException instead of returning null.
+    T getById(ID id);
+
     T save(T object);
 
     void delete(T object);

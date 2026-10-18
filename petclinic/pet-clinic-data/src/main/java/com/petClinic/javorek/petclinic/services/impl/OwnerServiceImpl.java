@@ -11,7 +11,7 @@ import java.util.List;
 public class OwnerServiceImpl extends AbstractJpaService<Owner, OwnerRepository> implements OwnerService {
 
     public OwnerServiceImpl(OwnerRepository repository) {
-        super(repository);
+        super(repository, "Owner");
     }
 
     @Override

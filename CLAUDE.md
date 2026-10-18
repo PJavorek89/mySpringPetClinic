@@ -14,7 +14,7 @@ Personal learning project (Udemy "Spring Framework 5: Beginner to Guru" Pet Clin
 
 ## Commands
 
-Run from `petclinic/` (Spring Boot 2.5.6 parent). The Maven wrapper is not set up (`mvnw` exists but `.mvn/` is missing); use the locally installed `mvn`. To add the wrapper, run `mvn wrapper:wrapper` in `petclinic/`.
+Run from `petclinic/` (Spring Boot 3.5, Java 21). The Maven wrapper exists (`mvnw`), the locally installed `mvn` works too.
 
 ```
 mvn clean install                      # build all modules
@@ -30,17 +30,14 @@ Note: `pet-clinic-web` depends on `pet-clinic-data` at a hard-coded version `0.0
 Multi-module Maven build (`groupId com.petClinic.javorek`, package root `com.petClinic.javorek.petclinic`):
 
 - **`pet-clinic-data`** — domain and service layer, no web code.
-  - `model/`: `BaseEntity` → `Person` → `Owner`/`Vet`, plus `Pet`, `PetType`, `Speciality`, `Visit`.
-  - `services/`: interfaces (`CrudService<T, ID>`, `OwnerService`, `PetService`, `PetTypeService`, `VetService`).
-  - `services/map/`: in-memory `HashMap` implementations. `AbstractMapService<T, ID>` provides the generic storage (its methods are package-private); concrete `*ServiceMap` classes extend it and implement the service interface, exposing the methods publicly and deriving the key from `object.getId()` on save.
-  - Dependencies include JPA, Lombok, and H2/MySQL/PostgreSQL drivers (runtime), but persistence is currently map-based.
-- **`pet-clinic-web`** — Spring Boot app (`PetclinicApplication`), Thymeleaf/web/actuator/devtools, and the controllers (`indexController`, `OwnerController`, `VetController`). Depends on `pet-clinic-data`.
-
-The parent `pom.xml` sets `java.version` 1.8, while the modules override the compiler source/target to 11 — Java 11 is what is actually needed.
+  - `model/`: `BaseEntity` → `Person` → `Owner`/`Vet`, plus `Pet`, `PetType`, `Specialty`, `Visit` (JPA entities).
+  - `repositories/`: Spring Data `JpaRepository` interfaces. Owner/Pet repositories use `@EntityGraph` on `findById`/`findAll` so lazy collections are loaded inside the transaction (open-in-view is off).
+  - `services/` + `services/impl/`: `CrudService<T, ID>` (adds `getById`, which throws `NotFoundException` -> 404) and `AbstractJpaService` (transactional, delegates to the repository). `PetService.addToOwner` / `VisitService.addToPet` create children and set the owning side.
+- **`pet-clinic-web`** — Spring Boot app (`PetclinicApplication`), no UI (Thymeleaf removed). `rest/` has `@RestController`s under `/api` and the single `GlobalExceptionHandler` (`ProblemDetail`); `dto/` has records (request records carry Bean Validation); `mapper/ClinicMapper` maps entities <-> DTOs by hand. `DataLoader` seeds sample data in the `dev` profile. Swagger UI via springdoc at `/swagger-ui.html`.
 
 ## Tech stack (target)
 
-- Java 21, Spring Boot 3.x, Maven (local `mvn`; wrapper not set up)
+- Java 21, Spring Boot 3.x, Maven
 - Spring Web, Spring Data JPA, H2 (dev), Bean Validation (`jakarta.*`, never `javax.*`)
 - springdoc-openapi for Swagger UI
 - Lombok is allowed for entities and DTOs

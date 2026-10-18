@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 public class VetServiceImpl extends AbstractJpaService<Vet, VetRepository> implements VetService {
 
     public VetServiceImpl(VetRepository repository) {
-        super(repository);
+        super(repository, "Vet");
     }
 }

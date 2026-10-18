@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 public class PetTypeServiceImpl extends AbstractJpaService<PetType, PetTypeRepository> implements PetTypeService {
 
     public PetTypeServiceImpl(PetTypeRepository repository) {
-        super(repository);
+        super(repository, "PetType");
     }
 }

@@ -5,6 +5,7 @@ import com.petClinic.javorek.petclinic.model.PetType;
 import com.petClinic.javorek.petclinic.model.Specialty;
 import com.petClinic.javorek.petclinic.model.Vet;
 import com.petClinic.javorek.petclinic.model.Visit;
+import com.petClinic.javorek.petclinic.repositories.OwnerRepository;
 import com.petClinic.javorek.petclinic.repositories.PetRepository;
 import com.petClinic.javorek.petclinic.repositories.PetTypeRepository;
 import com.petClinic.javorek.petclinic.repositories.SpecialtyRepository;
@@ -28,6 +29,8 @@ class OtherServicesTest {
     @Mock
     PetRepository petRepository;
     @Mock
+    OwnerRepository ownerRepository;
+    @Mock
     PetTypeRepository petTypeRepository;
     @Mock
     VetRepository vetRepository;
@@ -41,7 +44,7 @@ class OtherServicesTest {
         Pet pet = new Pet();
         when(petRepository.findAll()).thenReturn(List.of(pet));
 
-        assertThat(new PetServiceImpl(petRepository).findAll()).containsExactly(pet);
+        assertThat(new PetServiceImpl(petRepository, ownerRepository).findAll()).containsExactly(pet);
     }
 
     @Test
@@ -65,7 +68,7 @@ class OtherServicesTest {
         Visit visit = new Visit();
         when(visitRepository.findAll()).thenReturn(List.of(visit));
 
-        assertThat(new VisitServiceImpl(visitRepository).findAll()).containsExactly(visit);
+        assertThat(new VisitServiceImpl(visitRepository, petRepository).findAll()).containsExactly(visit);
     }
 
     @Test
