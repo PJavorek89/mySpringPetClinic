@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -52,10 +51,7 @@ public class OwnerRestController {
 
     @GetMapping
     public List<OwnerDto> list(@RequestParam(required = false) String lastName) {
-        List<Owner> owners = lastName == null || lastName.isBlank()
-                ? List.copyOf(ownerService.findAll())
-                : ownerService.findAllByLastNameStartingWith(lastName);
-        return owners.stream().sorted(Comparator.comparing(Owner::getId)).map(mapper::toDto).toList();
+        return ownerService.search(lastName).stream().map(mapper::toDto).toList();
     }
 
     @GetMapping("/{ownerId}")

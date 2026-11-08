@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -84,13 +83,13 @@ class OwnerRestControllerTest {
 
     @Test
     void listWithoutFilterReturnsAll() throws Exception {
-        when(ownerService.findAll()).thenReturn(Set.of(owner(1)));
+        when(ownerService.search(null)).thenReturn(List.of(owner(1)));
         mvc.perform(get("/api/owners")).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
     }
 
     @Test
     void listWithLastNameUsesPrefixSearch() throws Exception {
-        when(ownerService.findAllByLastNameStartingWith("No")).thenReturn(List.of(owner(1)));
+        when(ownerService.search("No")).thenReturn(List.of(owner(1)));
         mvc.perform(get("/api/owners").param("lastName", "No")).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].lastName").value("Novak"));
     }

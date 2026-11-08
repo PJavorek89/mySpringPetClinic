@@ -4,14 +4,19 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
 @Entity
 @Table(name = "owners")
 public class Owner extends Person {
@@ -23,5 +28,6 @@ public class Owner extends Person {
     // mappedBy: the foreign key lives in the pets table (Pet.owner), Owner is the inverse side.
     // cascade ALL: saving/deleting an owner saves/deletes their pets too.
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @Builder.Default
     private Set<Pet> pets = new HashSet<>();
 }

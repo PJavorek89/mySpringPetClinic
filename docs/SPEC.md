@@ -121,3 +121,51 @@ Veterinář se vrací i se seznamem specializací.
 - [ ] Validace ze sekce 5 vrací 400 se srozumitelnou chybou.
 - [ ] Po startu jsou v databázi ukázková data.
 - [ ] README popisuje, jak aplikaci spustit a vyzkoušet.
+
+## 10. Přidání AI funkcionality
+
+| Téma | Rozhodnutí | Důvod |
+|---|---|---|
+| Kde MCP server poběží | Ve stejné aplikaci, nový balíček `mcp` v `pet-clinic-web` | Monolit podle zadání. Nástroje volají přímo tvoje služby, žádné HTTP volání sama na sebe. |
+| Verze Spring AI | 1.1.x (nejnovější 1.1, přes `spring-ai-bom`) | Spring AI 2.x vyžaduje Spring Boot 4. Ty máš 3.5, kam patří řada 1.1. |
+| Starter | `spring-ai-starter-mcp-server-webmvc` | Máš Spring MVC (ne WebFlux). |
+| Transport | Streamable HTTP, `spring.ai.mcp.server.protocol=STREAMABLE`, endpoint `/mcp` | Aktuální standard. Starší SSE je zastaralý. |
+| Jak psát nástroje | Anotace `@McpTool` a `@McpToolParam` na metodách Spring beanu | Nejméně kódu, Spring je najde sám. |
+| Mazání přes MCP | Ne, žádný delete nástroj | Agent nemá umět smazat majitele. Bezpečnost začíná tím, co nástroj vůbec neumí. |
+
+### Nástroje MCP serveru
+
+Všechno jsou čtecí nástroje, žádný nic nemění.
+
+| Nástroj | Vstup | Vrací |
+|---|---|---|
+| `find_owners` | `lastName` (začátek příjmení, nepovinné) | seznam `OwnerDto` (id, jméno, adresa, město, telefon, zvířata včetně jejich id; agent z nich bere `ownerId` a `petId`) |
+| `get_owner` | `ownerId` | detail majitele se zvířaty a návštěvami |
+| `list_vets` | `specialty` (nepovinné) | veterináři se specializacemi |
+| `list_pet_types` | – | druhy zvířat |
+
+### Zapisovací nástroje MCP serveru
+
+Všechno jsou zapisovací nástroje, vytvářejí nové záznamy. Mazací nástroj záměrně neexistuje.
+
+| Nástroj | Vstup | Vrací |
+|---|---|---|
+| `register_owner` | `firstName`, `lastName`, `address`, `city`, `telephone` | nový majitel s id |
+| `add_pet` | `ownerId`, `name`, `birthDate`, `petType` (název, např. dog) | nové zvíře s id |
+| `record_visit` | `ownerId`, `petId`, `date` (nepovinné, výchozí dnes), `description` | nová návštěva s id |
+
+### Zakladní vztahy mezi nástroji
+
+ | Scénář                  | Nástroj        | Potřebuje                                        | Kde to vezme                                                                                                                  |
+ |-------------------------|----------------|--------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+  | `„Zapiš Rexovi návštěvu“` | `record_visit` | `ownerId`, `petId`, `datum (nepovinne)`, `popis` | `find_owners pro ownerId a petId`, `datum a popis poskytne uzivatel, pokud neposkytne datum, pocitej defaultne dnesek` | 
+### Pravidla
+
+- Stejná validace jako v REST API (sekce 5 ve SPEC.md). Chyba se vrací jako srozumitelná zpráva pro model, např. „Owner 999 does not exist. Use find_owners to look up the id.“ Nesmí to být stack trace.
+- `add_pet` bere druh názvem, ne id. Model zná slovo „pes“ nebo „dog“, id neví. Neznámý druh vrátí chybu se seznamem platných druhů.
+- Nástroje vracejí DTO (klidně stávající recordy), nikdy entity.
+
+### Reference
+
+- MCP anotace: https://docs.spring.io/spring-ai/reference/1.1/api/mcp/mcp-annotations-overview.html
+- MCP server starter: https://docs.spring.io/spring-ai/reference/1.1/api/mcp/mcp-server-boot-starter-docs.html

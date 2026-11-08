@@ -33,3 +33,36 @@ curl -i http://localhost:8080/api/owners/999   # 404 as a ProblemDetail
 ```
 
 Errors use the RFC 7807 `ProblemDetail` shape; validation errors (400) contain an `errors` field.
+
+## MCP server (AI agents)
+
+The same application also runs an MCP server (Spring AI, Streamable HTTP) at `http://localhost:8080/mcp`. It exposes the clinic services as tools for AI agents. Currently available: `find_owners` (search owners by the beginning of their last name; returns owner ids and pet ids). There is deliberately no delete tool.
+
+### Connecting from Claude Code
+
+Start the app first, then register the server:
+
+```
+claude mcp add --transport http pet-clinic http://localhost:8080/mcp
+```
+
+Inside Claude Code check it with `/mcp`, then ask e.g. "Find the owner Novák and list his pets".
+
+### Trying it with curl
+
+```
+# 1) initialize a session and note the Mcp-Session-Id response header
+curl -i -X POST http://localhost:8080/mcp \
+  -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"curl","version":"1.0"}}}'
+
+# 2) confirm initialization, then list and call tools (use your session id)
+curl -X POST http://localhost:8080/mcp -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" -H "Mcp-Session-Id: <session-id>" \
+  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+curl -X POST http://localhost:8080/mcp -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" -H "Mcp-Session-Id: <session-id>" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"find_owners","arguments":{"lastName":"nov"}}}'
+```
+
+You can also use the MCP Inspector: `npx @modelcontextprotocol/inspector` (transport: Streamable HTTP, URL `http://localhost:8080/mcp`).

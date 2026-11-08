@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,5 +84,51 @@ class OwnerServiceImplTest {
         when(ownerRepository.findByLastNameStartingWithIgnoreCase("Nov")).thenReturn(List.of(owner));
 
         assertThat(service.findAllByLastNameStartingWith("Nov")).containsExactly(owner);
+    }
+
+    @Test
+    void searchWithNullReturnsAllOwnersSortedById() {
+        Owner first = ownerWithId(1L);
+        Owner second = ownerWithId(2L);
+        // findAll() returns a Set, so the order is undefined; search() must sort by id.
+        when(ownerRepository.findAll()).thenReturn(List.of(second, first));
+
+        assertThat(service.search(null)).containsExactly(first, second);
+
+        verify(ownerRepository, never()).findByLastNameStartingWithIgnoreCase(any());
+    }
+
+    @Test
+    void searchWithBlankTextReturnsAllOwners() {
+        Owner owner = ownerWithId(1L);
+        when(ownerRepository.findAll()).thenReturn(List.of(owner));
+
+        assertThat(service.search("   ")).containsExactly(owner);
+
+        verify(ownerRepository, never()).findByLastNameStartingWithIgnoreCase(any());
+    }
+
+    @Test
+    void searchWithTextUsesPrefixSearchSortedById() {
+        Owner first = ownerWithId(1L);
+        Owner second = ownerWithId(2L);
+        when(ownerRepository.findByLastNameStartingWithIgnoreCase("Nov")).thenReturn(List.of(second, first));
+
+        assertThat(service.search("Nov")).containsExactly(first, second);
+
+        verify(ownerRepository, never()).findAll();
+    }
+
+    @Test
+    void searchWithNoMatchReturnsEmptyList() {
+        when(ownerRepository.findByLastNameStartingWithIgnoreCase("Xyz")).thenReturn(List.of());
+
+        assertThat(service.search("Xyz")).isEmpty();
+    }
+
+    private static Owner ownerWithId(Long id) {
+        Owner owner = new Owner();
+        owner.setId(id);
+        return owner;
     }
 }
